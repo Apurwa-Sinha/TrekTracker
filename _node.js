@@ -6,7 +6,7 @@ function Node(id, status) {
   this.direction = null;
   this.storedDirection = null;
   this.distance = Infinity;
-  this.totalDistance = Infinity;
+  this.totalDistance = Infinity; // Acts as 'f' (g + h) for forward search
   this.heuristicDistance = null;
   this.weight = 0;
   this.relatesToObject = false;
@@ -19,6 +19,7 @@ function Node(id, status) {
   this.otherdirection = null;
   this.otherstoredDirection = null;
   this.otherdistance = Infinity;
+  this.otherTotalDistance = Infinity; // ADD THIS: Acts as reverse 'f' for bidirectional A*
   this.otherweight = 0;
   this.otherrelatesToObject = false;
   this.otheroverwriteObjectRelation = false;
