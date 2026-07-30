@@ -1,28 +1,21 @@
+// bidirectional.js
+
 const astar = require("./astar");
 
-/**
- * Runs a bidirectional search from `start` and `target` simultaneously,
- * meeting somewhere in the middle.
- *
- * NOTE ON THE FIX: the original scoring formula multiplied the step cost
- * by the Manhattan distance to the goal:
- *
- *   currentNode.distance + (weight + stepCost) * manhattanDistance(...)
- *
- * That's not how A*-style scoring works (f = g + h, not g * h), and it
- * meant nodes far from the goal were penalized multiplicatively for every
- * single step, distorting the search so it wouldn't reliably find the
- * shortest path. It's now g + h, matching standard practice.
- */
 function bidirectional(nodes, start, target, nodesToAnimate, boardArray, name, heuristic, board) {
   if (name === "astar") return astar(nodes, start, target, nodesToAnimate, boardArray, name);
   if (!start || !target || start === target) {
     return false;
   }
 
+  // Initialize start node (Forward search)
   nodes[start].distance = 0;
+  nodes[start].totalScore = 0; // This acts as 'f' (f = g + h)
   nodes[start].direction = "right";
+  
+  // Initialize target node (Reverse search)
   nodes[target].otherdistance = 0;
+  nodes[target].otherTotalScore = 0; // This acts as reverse 'f'
   nodes[target].otherdirection = "left";
 
   let visitedNodes = {};
@@ -30,20 +23,21 @@ function bidirectional(nodes, start, target, nodesToAnimate, boardArray, name, h
   let unvisitedNodesTwo = Object.keys(nodes);
 
   while (unvisitedNodesOne.length && unvisitedNodesTwo.length) {
-    let currentNode = closestNode(nodes, unvisitedNodesOne, "distance");
-    let secondCurrentNode = closestNode(nodes, unvisitedNodesTwo, "otherdistance");
+    // FIX: Pass the correct key for the total A* score (f)
+    let currentNode = closestNode(nodes, unvisitedNodesOne, "totalScore");
+    let secondCurrentNode = closestNode(nodes, unvisitedNodesTwo, "otherTotalScore");
 
     while (
       (currentNode.status === "wall" || secondCurrentNode.status === "wall") &&
       unvisitedNodesOne.length &&
       unvisitedNodesTwo.length
     ) {
-      if (currentNode.status === "wall") currentNode = closestNode(nodes, unvisitedNodesOne, "distance");
-      if (secondCurrentNode.status === "wall") secondCurrentNode = closestNode(nodes, unvisitedNodesTwo, "otherdistance");
+      if (currentNode.status === "wall") currentNode = closestNode(nodes, unvisitedNodesOne, "totalScore");
+      if (secondCurrentNode.status === "wall") secondCurrentNode = closestNode(nodes, unvisitedNodesTwo, "otherTotalScore");
     }
 
     if (currentNode.distance === Infinity || secondCurrentNode.otherdistance === Infinity) {
-      return false;
+      return false; // No path found
     }
 
     nodesToAnimate.push(currentNode);
@@ -51,6 +45,7 @@ function bidirectional(nodes, start, target, nodesToAnimate, boardArray, name, h
     currentNode.status = "visited";
     secondCurrentNode.status = "visited";
 
+    // Stop condition: Frontiers meet
     if (visitedNodes[currentNode.id]) {
       board.middleNode = currentNode.id;
       return "success";
@@ -71,57 +66,62 @@ function bidirectional(nodes, start, target, nodesToAnimate, boardArray, name, h
 }
 
 /**
- * Pops and returns the unvisited node with the smallest value for `distanceKey`
- * ("distance" for the forward search, "otherdistance" for the reverse search).
- * Replaces the old closestNode/closestNodeTwo pair.
+ * Pops and returns the unvisited node with the smallest value for the given score key.
  */
-function closestNode(nodes, unvisitedNodes, distanceKey) {
+function closestNode(nodes, unvisitedNodes, scoreKey) {
   let currentClosest, index;
+  
   for (let i = 0; i < unvisitedNodes.length; i++) {
     const candidate = nodes[unvisitedNodes[i]];
-    if (!currentClosest || currentClosest[distanceKey] > candidate[distanceKey]) {
+    // If the node hasn't been reached yet, its score is Infinity
+    const candScore = candidate[scoreKey] !== undefined ? candidate[scoreKey] : Infinity;
+    const closestScore = (currentClosest && currentClosest[scoreKey] !== undefined) ? currentClosest[scoreKey] : Infinity;
+
+    if (!currentClosest || candScore < closestScore) {
       currentClosest = candidate;
       index = i;
     }
   }
+  
   unvisitedNodes.splice(index, 1);
   return currentClosest;
 }
 
 /**
  * Updates every walkable neighbor of `node` toward `targetId`.
- * `reverse` selects whether we're updating the forward-search fields
- * (distance/previousNode/direction) or the reverse-search fields
- * (otherdistance/otherpreviousNode/otherdirection).
- * Replaces updateNeighbors/updateNeighborsTwo + updateNode/updateNodeTwo.
  */
 function updateNeighbors(nodes, node, boardArray, targetId, reverse) {
   const neighbors = getNeighbors(node.id, nodes, boardArray);
   const targetNodeForHeuristic = nodes[targetId];
 
+  // Map keys based on whether this is the forward or reverse search
   const distanceKey = reverse ? "otherdistance" : "distance";
+  const totalScoreKey = reverse ? "otherTotalScore" : "totalScore";
   const previousNodeKey = reverse ? "otherpreviousNode" : "previousNode";
   const directionKey = reverse ? "otherdirection" : "direction";
 
   for (const neighborId of neighbors) {
     const neighborNode = nodes[neighborId];
 
-    // Skip nodes already finalized by this search direction — once a
-    // node has been visited/closed, its shortest distance is final;
-    // overwriting it later can leave the previousNode chain
-    // inconsistent for any node that already built its path through it.
     if (neighborNode.status === "visited") continue;
 
     const step = getStep(node, neighborNode, directionKey);
     const weight = neighborNode.weight === 15 ? 15 : 1;
 
-    // f = g (accumulated cost) + h (heuristic estimate to target)
+    // FIX THE SNOWBALL BUG: f = g + h
+    // 1. Calculate new accumulated cost (g) based ONLY on parent's distance (g), not parent's f!
     const g = node[distanceKey] + weight + step[0];
+    
+    // 2. Calculate heuristic (h)
     const h = manhattanDistance(neighborNode, targetNodeForHeuristic);
-    const score = g + h;
+    
+    // 3. Calculate total score (f)
+    const f = g + h;
 
-    if (score < neighborNode[distanceKey]) {
-      neighborNode[distanceKey] = score;
+    // Only update if we found a strictly shorter pure path (g) to this neighbor
+    if (neighborNode[distanceKey] === undefined || g < neighborNode[distanceKey]) {
+      neighborNode[distanceKey] = g;           // Store pure path cost (g)
+      neighborNode[totalScoreKey] = f;         // Store total A* score (f) used for sorting
       neighborNode[previousNodeKey] = node.id;
       neighborNode.path = step[1];
       neighborNode[directionKey] = step[2];
@@ -154,12 +154,6 @@ function getNeighbors(id, nodes, boardArray) {
   return neighbors;
 }
 
-/**
- * Returns [stepCost, turnPath, newFacingDirection] for moving from nodeOne
- * to nodeTwo, given nodeOne's current facing direction (read from
- * `directionKey`, so the same function serves both the forward and
- * reverse searches). Replaces getDistance/getDistanceTwo.
- */
 function getStep(nodeOne, nodeTwo, directionKey) {
   const [x1, y1] = nodeOne.id.split("-").map(Number);
   const [x2, y2] = nodeTwo.id.split("-").map(Number);
@@ -178,7 +172,10 @@ function getStep(nodeOne, nodeTwo, directionKey) {
   else if (y2 < y1) newDirection = "left";
   else if (y2 > y1) newDirection = "right";
 
-  const [cost, path] = turns[newDirection][facing];
+  // Fallback just in case `facing` isn't properly initialized
+  const safeFacing = facing || "right"; 
+  
+  const [cost, path] = turns[newDirection][safeFacing];
   return [cost, path, newDirection];
 }
 
@@ -189,6 +186,17 @@ function manhattanDistance(nodeOne, nodeTwo) {
 }
 
 module.exports = bidirectional;
+
+
+
+
+
+
+
+
+
+
+
 
 
   
