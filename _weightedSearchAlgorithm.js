@@ -1,24 +1,36 @@
+
 const astar = require("./astar");
 
 function weightedSearchAlgorithm(nodes, start, target, nodesToAnimate, boardArray, name, heuristic) {
-  if (name === "astar") return astar(nodes, start, target, nodesToAnimate, boardArray, name)
+  if (name === "astar") return astar(nodes, start, target, nodesToAnimate, boardArray, name);
   if (!start || !target || start === target) {
     return false;
   }
+  
+  // Initialize start node
   nodes[start].distance = 0;
+  nodes[start].totalDistance = 0; // f-score used for sorting
   nodes[start].direction = "right";
+  
   let unvisitedNodes = Object.keys(nodes);
+  
   while (unvisitedNodes.length) {
     let currentNode = closestNode(nodes, unvisitedNodes);
+    
     while (currentNode.status === "wall" && unvisitedNodes.length) {
-      currentNode = closestNode(nodes, unvisitedNodes)
+      currentNode = closestNode(nodes, unvisitedNodes);
     }
-    if (currentNode.distance === Infinity) {
+    
+    // If the closest node is at Infinity, we're trapped
+    if (currentNode.totalDistance === Infinity) {
       return false;
     }
+    
     nodesToAnimate.push(currentNode);
     currentNode.status = "visited";
+    
     if (currentNode.id === target) return "success!";
+    
     if (name === "CLA" || name === "greedy") {
       updateNeighbors(nodes, currentNode, boardArray, target, name, start, heuristic);
     } else if (name === "dijkstra") {
@@ -27,10 +39,11 @@ function weightedSearchAlgorithm(nodes, start, target, nodesToAnimate, boardArra
   }
 }
 
+// Fixed: Now sorts by totalDistance (f-score) instead of raw distance
 function closestNode(nodes, unvisitedNodes) {
   let currentClosest, index;
   for (let i = 0; i < unvisitedNodes.length; i++) {
-    if (!currentClosest || currentClosest.distance > nodes[unvisitedNodes[i]].distance) {
+    if (!currentClosest || currentClosest.totalDistance > nodes[unvisitedNodes[i]].totalDistance) {
       currentClosest = nodes[unvisitedNodes[i]];
       index = i;
     }
@@ -59,30 +72,38 @@ function averageNumberOfNodesBetween(currentNode) {
   return num;
 }
 
-
 function updateNode(currentNode, targetNode, actualTargetNode, name, nodes, actualStartNode, heuristic, boardArray) {
-  let distance = getDistance(currentNode, targetNode);
-  let distanceToCompare;
+  let distanceData = getDistance(currentNode, targetNode);
+  let weight = targetNode.weight === 15 ? 15 : 1;
+  
+  // Accumulated distance from start to this neighbor (g)
+  let g = currentNode.distance + weight + distanceData[0];
+  let f; // Total score used for priority queue sorting
+
   if (actualTargetNode && name === "CLA") {
-    let weight = targetNode.weight === 15 ? 15 : 1;
+    let h = 0;
     if (heuristic === "manhattanDistance") {
-      distanceToCompare = currentNode.distance + (distance[0] + weight) * manhattanDistance(targetNode, actualTargetNode);
+      h = manhattanDistance(targetNode, actualTargetNode);
     } else if (heuristic === "poweredManhattanDistance") {
-      distanceToCompare = currentNode.distance + targetNode.weight + distance[0] + Math.pow(manhattanDistance(targetNode, actualTargetNode), 2);
+      h = Math.pow(manhattanDistance(targetNode, actualTargetNode), 2);
     } else if (heuristic === "extraPoweredManhattanDistance") {
-      distanceToCompare = currentNode.distance + (distance[0] + weight) * Math.pow(manhattanDistance(targetNode, actualTargetNode), 7);
+      h = Math.pow(manhattanDistance(targetNode, actualTargetNode), 7);
     }
-    let startNodeManhattanDistance = manhattanDistance(actualStartNode, actualTargetNode);
+    f = g + h; // f = g + h (Swarm/A*)
   } else if (actualTargetNode && name === "greedy") {
-    distanceToCompare = targetNode.weight + distance[0] + manhattanDistance(targetNode, actualTargetNode);
+    f = manhattanDistance(targetNode, actualTargetNode); // Greedy only cares about heuristic (f = h)
   } else {
-    distanceToCompare = currentNode.distance + targetNode.weight + distance[0];
+    // Dijkstra (no heuristic, f = g)
+    f = g;
   }
-  if (distanceToCompare < targetNode.distance) {
-    targetNode.distance = distanceToCompare;
+
+  // Update neighbor if we found a strictly better total score
+  if (f < targetNode.totalDistance) {
+    targetNode.distance = g;           // Pure distance cost
+    targetNode.totalDistance = f;      // Total score for sorting
     targetNode.previousNode = currentNode.id;
-    targetNode.path = distance[1];
-    targetNode.direction = distance[2];
+    targetNode.path = distanceData[1];
+    targetNode.direction = distanceData[2];
   }
 }
 
@@ -93,24 +114,23 @@ function getNeighbors(id, nodes, boardArray) {
   let neighbors = [];
   let potentialNeighbor;
   if (boardArray[x - 1] && boardArray[x - 1][y]) {
-    potentialNeighbor = `${(x - 1).toString()}-${y.toString()}`
+    potentialNeighbor = `${(x - 1).toString()}-${y.toString()}`;
     if (nodes[potentialNeighbor].status !== "wall") neighbors.push(potentialNeighbor);
   }
   if (boardArray[x + 1] && boardArray[x + 1][y]) {
-    potentialNeighbor = `${(x + 1).toString()}-${y.toString()}`
+    potentialNeighbor = `${(x + 1).toString()}-${y.toString()}`;
     if (nodes[potentialNeighbor].status !== "wall") neighbors.push(potentialNeighbor);
   }
   if (boardArray[x][y - 1]) {
-    potentialNeighbor = `${x.toString()}-${(y - 1).toString()}`
+    potentialNeighbor = `${x.toString()}-${(y - 1).toString()}`;
     if (nodes[potentialNeighbor].status !== "wall") neighbors.push(potentialNeighbor);
   }
   if (boardArray[x][y + 1]) {
-    potentialNeighbor = `${x.toString()}-${(y + 1).toString()}`
+    potentialNeighbor = `${x.toString()}-${(y + 1).toString()}`;
     if (nodes[potentialNeighbor].status !== "wall") neighbors.push(potentialNeighbor);
   }
   return neighbors;
 }
-
 
 function getDistance(nodeOne, nodeTwo) {
   let currentCoordinates = nodeOne.id.split("-");
@@ -161,6 +181,8 @@ function getDistance(nodeOne, nodeTwo) {
       return [2, ["l", "f"], "right"];
     }
   }
+  // Fallback distance for edge cases where nodes are same
+  return [0, ["f"], nodeOne.direction];
 }
 
 function manhattanDistance(nodeOne, nodeTwo) {
@@ -171,6 +193,7 @@ function manhattanDistance(nodeOne, nodeTwo) {
   return (xChange + yChange);
 }
 
+// Unused algorithm left intact so nothing breaks globally
 function weightedManhattanDistance(nodeOne, nodeTwo, nodes) {
   let nodeOneCoordinates = nodeOne.id.split("-").map(ele => parseInt(ele));
   let nodeTwoCoordinates = nodeTwo.id.split("-").map(ele => parseInt(ele));
@@ -316,8 +339,9 @@ function weightedManhattanDistance(nodeOne, nodeTwo, nodes) {
     }
 
   return xChange + yChange;
-
-
 }
 
 module.exports = weightedSearchAlgorithm;
+
+
+
