@@ -105,6 +105,13 @@ function updateNeighbors(nodes, node, boardArray, targetId, reverse) {
 
   for (const neighborId of neighbors) {
     const neighborNode = nodes[neighborId];
+
+    // Skip nodes already finalized by this search direction — once a
+    // node has been visited/closed, its shortest distance is final;
+    // overwriting it later can leave the previousNode chain
+    // inconsistent for any node that already built its path through it.
+    if (neighborNode.status === "visited") continue;
+
     const step = getStep(node, neighborNode, directionKey);
     const weight = neighborNode.weight === 15 ? 15 : 1;
 
@@ -182,6 +189,12 @@ function manhattanDistance(nodeOne, nodeTwo) {
 }
 
 module.exports = bidirectional;
-     
 
 
+  
+
+
+
+
+
+ 
