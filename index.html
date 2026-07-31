@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathfinding Visualizer</title>
+  
+  <!-- Bootstrap 3 for the Navbar structure -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  
+  <!-- Your custom CSS files -->
+  <link rel="stylesheet" href="/public/flat-ui.css">
+  <link rel="stylesheet" href="/public/style.css">
+  
+  <style>
+    /* Basic styling for the Legend */
+    #mainText {
+      margin: 15px auto;
+      text-align: center;
+    }
+    #mainText ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    #mainText li {
+      display: inline-block;
+      margin: 0 10px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+    #mainText li div {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+      border: 1px solid #c3c3c3;
+    }
+    #board {
+      margin: 20px auto;
+      text-align: center;
+    }
+    /* Simple button styling for the Visualize button */
+    #startButtonStart {
+      background-color: #1abc9c;
+      color: white;
+      font-weight: bold;
+      border: none;
+      margin-top: 8px;
+    }
+    #startButtonStart:hover {
+      background-color: #16a085;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-inverse" style="margin-bottom: 0; border-radius: 0;">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Pathfinding Visualizer</a>
+      </div>
+      <ul class="nav navbar-nav">
+        
+        <!-- Algorithms Dropdown -->
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Algorithms <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li id="startButtonDijkstra"><a href="#">Dijkstra's Algorithm</a></li>
+            <li id="startButtonAStar"><a href="#">A* Search</a></li>
+            <li id="startButtonGreedy"><a href="#">Greedy Best-first Search</a></li>
+            <li id="startButtonCLA"><a href="#">Swarm Algorithm</a></li>
+            <li id="startButtonBidirectional"><a href="#">Bidirectional Swarm</a></li>
+            <li id="startButtonBFS"><a href="#">Breadth-first Search</a></li>
+            <li id="startButtonDFS"><a href="#">Depth-first Search</a></li>
+          </ul>
+        </li>
+
+        <!-- Mazes Dropdown -->
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mazes & Patterns <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li id="startButtonCreateMazeTwo"><a href="#">Recursive Division</a></li>
+            <li id="startButtonCreateMazeThree"><a href="#">Recursive Division (vertical skew)</a></li>
+            <li id="startButtonCreateMazeFour"><a href="#">Recursive Division (horizontal skew)</a></li>
+            <li id="startButtonCreateMazeOne"><a href="#">Basic Random Maze</a></li>
+            <li id="startButtonCreateMazeWeights"><a href="#">Basic Weight Maze</a></li>
+            <li id="startStairDemonstration"><a href="#">Simple Stair Pattern</a></li>
+          </ul>
+        </li>
+
+        <!-- Action Buttons -->
+        <li id="startButtonAddObject"><a href="#">Add Target Object</a></li>
+        <li>
+          <button id="startButtonStart" class="btn btn-default navbar-btn" type="button">Visualize!</button>
+        </li>
+        <li><a href="#" id="startButtonClearBoard">Clear Board</a></li>
+        <li><a href="#" id="startButtonClearPath">Clear Path</a></li>
+        
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Legend -->
+  <div id="mainText">
+    <ul>
+      <li><div style="background-color: #4CAF50;"></div>Start Node</li>
+      <li><div style="background-color: #F44336;"></div>Target Node</li>
+      <li><div style="background-color: purple;"></div>Object Node</li>
+      <li><div style="background-color: #34495e; border-radius: 50%;"></div>Weight Node</li>
+      <li><div style="background-color: white;"></div>Unvisited Node</li>
+      <li><div style="background-color: #3498db;"></div>Visited Node</li>
+      <li><div style="background-color: yellow;"></div>Shortest-path Node</li>
+      <li><div style="background-color: #2c3e50;"></div>Wall Node</li>
+    </ul>
+  </div>
+
+  <!-- Grid Container: board.js will inject the grid elements here -->
+  <div id="board"></div>
+
+  <!-- Scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+  <!-- This points to your bundled JS file -->
+  <script src="/public/browser/bundle.js"></script>
+
+</body>
+</html>
