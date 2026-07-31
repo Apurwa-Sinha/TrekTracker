@@ -1,31 +1,65 @@
-# TrekTracker
+# 🗺️ TrekTracker
 
-# TrekTracker
+[![Live Demo](https://img.shields.io/badge/Demo-Live_Preview-brightgreen.svg)](#) <!-- Add your deployment link here -->
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Welcome to TrekTracker! I built this application because I was fascinated by pathfinding algorithms, and I wanted to visualize them in action. I hope that you enjoy playing around with this visualization tool just as much as I enjoyed building it. 
+**TrekTracker** is an interactive, multi-sensory web application built to visualize how different graph theory algorithms hunt for the shortest path. 
 
-## Meet the Algorithms
+Moving beyond standard grid visualizers, TrekTracker pushes the boundaries of browser rendering and AI simulation. It features **3D Isometric rendering**, **Dynamic Heatmaps**, **Algorithm Sonification (Audio)**, and an **Analytics Dashboard** to compare the performance and memory usage of various search strategies in real-time.
 
-This application supports the following algorithms: 
+<p align="center">
+  <!-- 💡 TIP: Record a 10-second GIF of your project running in 3D mode with the heatmap and place it in your folder. Then update this image path! -->
+  <img src="./public/demo.gif" alt="TrekTracker Demo GIF" width="800" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+</p>
 
-**Dijkstra's Algorithm** (weighted): the father of pathfinding algorithms; guarantees the shortest path
+---
 
-**A* Search** (weighted): arguably the best pathfinding algorithm; uses heuristics to guarantee the shortest path much faster than Dijkstra's Algorithm
+## ✨ Standout Features
 
-**Greedy Best-first Search** (weighted): a faster, more heuristic-heavy version of A*; does not guarantee the shortest path
+While most visualizers stop at flat 2D grids and basic coloring, TrekTracker introduces next-level UI/UX and DOM manipulation:
 
-**Swarm Algorithm** (weighted): a mixture of Dijkstra's Algorithm and A*; does not guarantee the shortest-path
+*   🏙️ **3D Isometric Engine:** Toggle the grid into a hardware-accelerated 3D plane using advanced CSS3 transforms. Walls physically extrude to form a "cityscape," and the algorithm's path weaves dynamically through the skyscrapers.
+*   🌡️ **Thermal Heatmap Generation:** Explored nodes don't just change color—they dynamically map their distance from the start to an HSL color gradient. Watch the algorithm expand from cold blue, to green, and finally blazing red as it explores deeper.
+*   🎵 **Algorithm Sonification:** Hooked into the Web Audio API, TrekTracker maps grid distances to a C-Major Pentatonic scale. You can actually *hear* the math as the algorithm searches—Breadth-First Search creates a chaotic symphony, while A* plays a targeted, climbing melody.
+*   📊 **Real-Time Analytics Dashboard:** After an algorithm finishes, the dashboard displays Execution Time (ms), Nodes Explored (simulating memory footprint), and the Shortest Path Length, mathematically proving why heuristic algorithms outpace unweighted ones.
+*   🦇 **Cellular Automata Caves:** Alongside standard Recursive Division mazes, TrekTracker uses Cellular Automata to generate organic, natural-looking cave systems.
 
-**Convergent Swarm Algorithm** (weighted): the faster, more heuristic-heavy version of Swarm; does not guarantee the shortest path
+---
 
-**Bidirectional Swarm Algorithm** (weighted): Swarm from both sides; does not guarantee the shortest path
+## 🧠 Algorithms Implemented
 
-**Breath-first Search** (unweighted): a great algorithm; guarantees the shortest path
+### Weighted Algorithms (Accounts for terrain cost)
+*   **A* Search:** Arguably the best pathfinding algorithm; uses heuristics to guarantee the shortest path much faster than Dijkstra.
+*   **Dijkstra's Algorithm:** The father of pathfinding algorithms; guarantees the shortest path but blindly explores in all directions.
+*   **Greedy Best-first Search:** A faster, heuristic-heavy version of A*; does not guarantee the shortest path.
+*   **Swarm Algorithm:** A custom heuristic algorithm that acts as a blend of Dijkstra and A*.
+*   **Bidirectional Swarm:** Two swarm algorithms that start from both sides and meet in the middle.
 
-**Depth-first Search** (unweighted): a very bad algorithm for pathfinding; does not guarantee the shortest path
+### Unweighted Algorithms (Ignores terrain cost)
+*   **Breadth-first Search (BFS):** Explores all neighbors equally. Guarantees the shortest path on an unweighted grid.
+*   **Depth-first Search (DFS):** Explores as deeply as possible before backtracking. A terrible algorithm for pathfinding, included for educational comparison.
 
-On top of the pathfinding algorithms listed above, I implemented a **Recursive Division** Maze Generation algorithm.
+---
 
-## More about the Swarm Algorithm
+## 🏗️ Architecture & Code Quality
 
-The Swarm Algorithm is an algorithm that I - at least presumably so (I was unable to find anything close to it online) - co-developed with a good friend and colleague. The algorithm is essentially a mixture of Dijkstra's Algorithm and A* Search; more precisely, while it converges to the target node like A* , it still explores quite a few neighboring nodes surrounding the start node like Dijkstra's. The algorithm differentiates itself from A* through its use of heuristics: it continually updates nodes' distance from the start node while taking into account their estimated distance from the target node. This effectively "balances" the difference in total distance between nodes closer to the start node and nodes closer to the target node, which results in the triangle-like shape of the Swarm Algorithm. We named the algorithm "Swarm" because one of its potential applications could be seen in a video-game where a character must keep track of a boss with high priority (the target node), all the while keeping tracking of neighboring enemies that might be swarming nearby. 
+TrekTracker was built with a strict adherence to **Object-Oriented Programming (OOP)** and the **Single Responsibility Principle (SRP)**. 
+
+The monolithic board logic is broken down into highly modular, testable files:
+*   `algorithmRunner.js`: Handles algorithm execution, timing, and dashboard updates.
+*   `launchAnimations.js`: Manages the asynchronous animation queue and calculates the HSL Heatmap math.
+*   `audioSymphony.js`: Isolates the Web Audio API synthesizer logic.
+*   `clearPath.js` / `clearBoard.js`: Dedicated state-reset modules.
+
+---
+
+## 🛠️ Installation & Setup
+
+To run TrekTracker locally on your machine:
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/](https://github.com/)<your-username>/trektracker.git
+   cd trektracker
+
