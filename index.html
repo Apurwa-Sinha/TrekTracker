@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pathfinding Visualizer</title>
   
+  <!-- Bootstrap 3 for the Navbar structure -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  
+  <!-- Your custom CSS files -->
   <link rel="stylesheet" href="/public/flat-ui.css">
   <link rel="stylesheet" href="/public/style.css">
   
@@ -21,6 +24,9 @@
     
     #button3D { background-color: #9b59b6; color: white; font-weight: bold; border: none; margin-top: 8px; margin-left: 10px; }
     #button3D:hover { background-color: #8e44ad; }
+
+    #buttonSound { background-color: #f39c12; color: white; font-weight: bold; border: none; margin-top: 8px; margin-left: 10px; }
+    #buttonSound:hover { background-color: #e67e22; }
 
     /* --------------------------------------------------- */
     /* 🌆 THE MAGICAL 3D ISOMETRIC CSS 🌆 */
@@ -122,8 +128,8 @@
         <!-- Action Buttons -->
         <li id="startButtonAddObject"><a href="#">Add Target Object</a></li>
         <li><button id="startButtonStart" class="btn btn-default navbar-btn" type="button">Visualize!</button></li>
-        <!-- NEW 3D BUTTON -->
         <li><button id="button3D" class="btn navbar-btn" type="button">Toggle 3D Mode</button></li>
+        <li><button id="buttonSound" class="btn navbar-btn" type="button">🔊 Sound: OFF</button></li>
         <li><a href="#" id="startButtonClearBoard">Clear Board</a></li>
         <li><a href="#" id="startButtonClearPath">Clear Path</a></li>
       </ul>
@@ -154,6 +160,7 @@
     </div>
   </div>
 
+  <!-- Legend -->
   <div id="mainText">
     <ul>
       <li><div style="background-color: #4CAF50;"></div>Start Node</li>
@@ -167,6 +174,7 @@
     </ul>
   </div>
 
+  <!-- Grid Container -->
   <div id="board"></div>
 
   <!-- Scripts -->
@@ -174,13 +182,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="/public/browser/bundle.js"></script>
 
-  <!-- SMALL SCRIPT TO TOGGLE 3D -->
+  <!-- SCRIPTS FOR 3D MODE AND AUDIO TOGGLES -->
   <script>
+    // 3D Mode Toggle
     document.getElementById("button3D").onclick = function() {
-      // Toggles the isometric-mode class on the body
       document.body.classList.toggle("isometric-mode");
-      
-      // Change the button text
       if (document.body.classList.contains("isometric-mode")) {
         this.innerText = "Disable 3D Mode";
         this.style.backgroundColor = "#e74c3c"; // Turn red
@@ -189,10 +195,36 @@
         this.style.backgroundColor = "#9b59b6"; // Turn purple
       }
     };
+
+    // Sound Mode Toggle
+    window.soundEnabled = false; // Global variable read by audioSymphony.js
+
+    document.getElementById("buttonSound").onclick = function() {
+      window.soundEnabled = !window.soundEnabled;
+      
+      if (window.soundEnabled) {
+        this.innerText = "🔊 Sound: ON";
+        this.style.backgroundColor = "#27ae60"; // Turn green
+        // Initialize an empty audio context on user gesture to bypass browser restrictions
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
+        ctx.resume();
+      } else {
+        this.innerText = "🔊 Sound: OFF";
+        this.style.backgroundColor = "#f39c12"; // Turn orange
+      }
+    };
   </script>
 
 </body>
 </html>
+    
+
+
+
+
+
+      
+
   
            
       
