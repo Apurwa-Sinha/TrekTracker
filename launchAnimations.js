@@ -1,27 +1,26 @@
-function launchAnimations(board, success, type, object, algorithm, heuristic) {
-  // Combine nodes to animate if the user placed a target object (midpoint)
-  let nodes = object ? board.nodesToAnimate.concat(board.objectNodesToAnimate) : board.nodesToAnimate;
-  
-  let speed = 10; // Speed of the expanding search (in milliseconds)
+const { playNoteForNode, playSuccessChord } = require('./audioSymphony'); // 🎵 IMPORT AUDIO
 
-  // Helper function to draw the final yellow path once the search completes
+function launchAnimations(board, success, type, object, algorithm, heuristic) {
+  let nodes = object ? board.nodesToAnimate.concat(board.objectNodesToAnimate) : board.nodesToAnimate;
+  let speed = 10; 
+
   function animateShortestPath() {
     let shortestNodes = [];
     let currentNode = board.nodes[board.target];
     
-    // Backtrack from the target using the previousNode property
     while (currentNode && currentNode.id !== board.start) {
       shortestNodes.unshift(currentNode);
       currentNode = board.nodes[currentNode.previousNode];
     }
     
-    // Animate the shortest path slightly slower for a dramatic effect
     for (let i = 0; i < shortestNodes.length; i++) {
       setTimeout(() => {
         let node = shortestNodes[i];
         let el = document.getElementById(node.id);
         
-        // Preserve the start/target/object icons while coloring the path
+        el.style.backgroundColor = ""; 
+        el.style.border = "";
+        
         if (node.id === board.target) {
           el.className = "target shortest-path";
         } else if (node.id === board.object) {
@@ -33,12 +32,11 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
     }
   }
 
-  // Loop through all visited nodes to create the expanding animation
   for (let i = 0; i <= nodes.length; i++) {
-    // Once we finish animating the visited nodes, trigger the shortest path
     if (i === nodes.length) {
       setTimeout(() => {
         if (success) {
+          playSuccessChord(); // 🎵 PLAY CHORD WHEN TARGET IS FOUND
           animateShortestPath();
         }
       }, i * speed);
@@ -51,11 +49,20 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
       let relevantStatuses = ["start", "target", "object"];
       
       if (!relevantStatuses.includes(node.status)) {
-        // If the node was a heavy weight, keep it visually distinct when visited
+        
+        // 🎵 PLAY INDIVIDUAL NOTE FOR THIS NODE (throttle to every 2nd node to prevent audio tearing)
+        if (i % 2 === 0) playNoteForNode(node.id, board.target);
+
+        let fraction = i / nodes.length; 
+        let hue = Math.floor(240 - (fraction * 240)); 
+
         if (node.weight === 15) {
           currentHTMLNode.className = "visited weight";
+          currentHTMLNode.style.backgroundColor = `hsl(${hue}, 100%, 30%)`; 
         } else {
           currentHTMLNode.className = "visited";
+          currentHTMLNode.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+          currentHTMLNode.style.border = `1px solid hsl(${hue}, 100%, 40%)`; 
         }
       }
     }, i * speed);
@@ -63,3 +70,6 @@ function launchAnimations(board, success, type, object, algorithm, heuristic) {
 }
 
 module.exports = launchAnimations;
+        
+        
+
