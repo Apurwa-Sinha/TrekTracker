@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,45 +14,13 @@
   <link rel="stylesheet" href="/public/style.css">
   
   <style>
-    /* Basic styling for the Legend */
-    #mainText {
-      margin: 15px auto;
-      text-align: center;
-    }
-    #mainText ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    #mainText li {
-      display: inline-block;
-      margin: 0 10px;
-      font-size: 14px;
-      font-family: Arial, sans-serif;
-    }
-    #mainText li div {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      margin-right: 5px;
-      vertical-align: middle;
-      border: 1px solid #c3c3c3;
-    }
-    #board {
-      margin: 20px auto;
-      text-align: center;
-    }
-    /* Simple button styling for the Visualize button */
-    #startButtonStart {
-      background-color: #1abc9c;
-      color: white;
-      font-weight: bold;
-      border: none;
-      margin-top: 8px;
-    }
-    #startButtonStart:hover {
-      background-color: #16a085;
-    }
+    #mainText { margin: 15px auto; text-align: center; }
+    #mainText ul { list-style-type: none; padding: 0; margin: 0; }
+    #mainText li { display: inline-block; margin: 0 10px; font-size: 14px; font-family: Arial, sans-serif; }
+    #mainText li div { display: inline-block; width: 20px; height: 20px; margin-right: 5px; vertical-align: middle; border: 1px solid #c3c3c3; }
+    #board { margin: 20px auto; text-align: center; }
+    #startButtonStart { background-color: #1abc9c; color: white; font-weight: bold; border: none; margin-top: 8px; }
+    #startButtonStart:hover { background-color: #16a085; }
   </style>
 </head>
 <body>
@@ -63,7 +32,6 @@
         <a class="navbar-brand" href="#">Pathfinding Visualizer</a>
       </div>
       <ul class="nav navbar-nav">
-        
         <!-- Algorithms Dropdown -->
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Algorithms <span class="caret"></span></a>
@@ -93,15 +61,36 @@
 
         <!-- Action Buttons -->
         <li id="startButtonAddObject"><a href="#">Add Target Object</a></li>
-        <li>
-          <button id="startButtonStart" class="btn btn-default navbar-btn" type="button">Visualize!</button>
-        </li>
+        <li><button id="startButtonStart" class="btn btn-default navbar-btn" type="button">Visualize!</button></li>
         <li><a href="#" id="startButtonClearBoard">Clear Board</a></li>
         <li><a href="#" id="startButtonClearPath">Clear Path</a></li>
-        
       </ul>
     </div>
   </nav>
+
+  <!-- Analytics Dashboard (NEW) -->
+  <div id="analytics-dashboard" class="container" style="display: none; margin-top: 15px;">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <div class="panel panel-info">
+          <div class="panel-heading" style="font-weight: bold;">Execution Time</div>
+          <div class="panel-body" id="stat-time" style="font-size: 18px;">0 ms</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-warning">
+          <div class="panel-heading" style="font-weight: bold;">Nodes Explored (Memory)</div>
+          <div class="panel-body" id="stat-explored" style="font-size: 18px;">0</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-success">
+          <div class="panel-heading" style="font-weight: bold;">Shortest Path Length</div>
+          <div class="panel-body" id="stat-path" style="font-size: 18px;">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Legend -->
   <div id="mainText">
@@ -117,15 +106,17 @@
     </ul>
   </div>
 
-  <!-- Grid Container: board.js will inject the grid elements here -->
+  <!-- Grid Container -->
   <div id="board"></div>
 
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  
-  <!-- This points to your bundled JS file -->
   <script src="/public/browser/bundle.js"></script>
 
 </body>
 </html>
+
+
+
+ 
