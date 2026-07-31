@@ -4,13 +4,11 @@ const bidirectional = require('./bidirectional');
 const launchAnimations = require('./launchAnimations');
 
 function runAlgorithm(board) {
-  // Check if the user actually picked an algorithm first
   if (!board.currentAlgorithm) {
     document.getElementById("startButtonStart").innerHTML = '<button class="btn btn-default navbar-btn" type="button">Pick an Algorithm!</button>';
     return;
   }
 
-  // 1. Clean the board before running
   board.clearPath("clickedButton");
   board.toggleButtons();
 
@@ -18,10 +16,8 @@ function runAlgorithm(board) {
   let unweightedAlgorithms = ["dfs", "bfs"];
   let success;
 
-  // ⏱️ START THE STOPWATCH
   let startTime = performance.now();
 
-  // 2. Run the selected algorithm
   if (board.currentAlgorithm === "bidirectional") {
     if (!board.numberOfObjects) {
       success = bidirectional(board.nodes, board.start, board.target, board.nodesToAnimate, board.boardArray, board.currentAlgorithm, board.currentHeuristic, board);
@@ -52,14 +48,10 @@ function runAlgorithm(board) {
     board.algoDone = true;
   }
 
-  // ⏱️ STOP THE STOPWATCH
   let endTime = performance.now();
-  
-  // 3. Update the Analytics Dashboard
   updateAnalytics(board, startTime, endTime, success);
 }
 
-// Helper function for the dashboard
 function updateAnalytics(board, startTime, endTime, success) {
   let timeTaken = (endTime - startTime).toFixed(2);
   let nodesExplored = board.nodesToAnimate.length;
@@ -76,7 +68,6 @@ function updateAnalytics(board, startTime, endTime, success) {
     }
   }
 
-  // Display the stats
   document.getElementById("analytics-dashboard").style.display = "block";
   document.getElementById("stat-time").innerText = timeTaken + " ms";
   document.getElementById("stat-explored").innerText = nodesExplored + " nodes";
@@ -84,3 +75,5 @@ function updateAnalytics(board, startTime, endTime, success) {
 }
 
 module.exports = runAlgorithm;
+
+
