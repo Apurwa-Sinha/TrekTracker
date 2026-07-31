@@ -1,17 +1,11 @@
 # 🗺️ TrekTracker
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live_Preview-brightgreen.svg)](#) <!-- Add your deployment link here -->
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **TrekTracker** is an interactive, multi-sensory web application built to visualize how different graph theory algorithms hunt for the shortest path. 
 
 Moving beyond standard grid visualizers, TrekTracker pushes the boundaries of browser rendering and AI simulation. It features **3D Isometric rendering**, **Dynamic Heatmaps**, **Algorithm Sonification (Audio)**, and an **Analytics Dashboard** to compare the performance and memory usage of various search strategies in real-time.
-
-<p align="center">
-  <!-- 💡 TIP: Record a 10-second GIF of your project running in 3D mode with the heatmap and place it in your folder. Then update this image path! -->
-  <img src="./public/demo.gif" alt="TrekTracker Demo GIF" width="800" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-</p>
 
 ---
 
@@ -62,4 +56,7 @@ To run TrekTracker locally on your machine:
    ```bash
    git clone [https://github.com/](https://github.com/)<your-username>/trektracker.git
    cd trektracker
+
+
+
 
