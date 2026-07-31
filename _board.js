@@ -181,6 +181,7 @@ Board.prototype.changeSpecialNode = function(currentNode) {
 };
 const clearPath = require('./clearPath');
 const runAlgorithm = require('./algorithmRunner'); // The file we made in the last step
+const clearBoard = require('./clearBoard');
 Board.prototype.changeNormalNode = function(currentNode) {
   let element = document.getElementById(currentNode.id);
   let relevantStatuses = ["start", "target", "object"];
